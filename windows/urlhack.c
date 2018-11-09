@@ -101,6 +101,7 @@ void urlhack_add_link_region(int x0, int y0, int x1, int y1)
 
 void urlhack_launch_url(const char* app, const char *url)
 {
+    AllowSetForegroundWindow(ASFW_ANY);
     if (app) {
         ShellExecute(NULL, NULL, app, url, NULL, SW_SHOWNORMAL);
     } else {
