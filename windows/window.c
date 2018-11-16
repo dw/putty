@@ -3384,16 +3384,20 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message,
 	    }
 
 	    /* process events when the threshold is reached */
-	    while (abs(wheel_accumulator) >= WHEEL_DELTA) {
+            float lines_per_delta = 3;
+            int delta_per_line = WHEEL_DELTA / lines_per_delta;
+
+            int nlines;
+            while ((nlines = abs(wheel_accumulator) / delta_per_line)) {
 		int b;
 
 		/* reduce amount for next time */
 		if (wheel_accumulator > 0) {
 		    b = MBT_WHEEL_UP;
-		    wheel_accumulator -= WHEEL_DELTA;
+		    wheel_accumulator -= nlines * delta_per_line;
 		} else if (wheel_accumulator < 0) {
 		    b = MBT_WHEEL_DOWN;
-		    wheel_accumulator += WHEEL_DELTA;
+		    wheel_accumulator += nlines * delta_per_line;
 		} else
 		    break;
 
@@ -3414,9 +3418,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT message,
 		    } /* else: not sure when this can fail */
 		} else {
 		    /* trigger a scroll */
-		    term_scroll(term, 0,
-				b == MBT_WHEEL_UP ?
-				-term->rows / 2 : term->rows / 2);
+		    term_scroll(term, 0, b == MBT_WHEEL_UP ? -nlines : nlines);
 		}
 	    }
 	    return 0;
